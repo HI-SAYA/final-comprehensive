@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/comprehensive
+    username: ohgiraffers
+    password: ohgiraffers
+
+#jpa config
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+#server prot
+server:
+  port: 8001
