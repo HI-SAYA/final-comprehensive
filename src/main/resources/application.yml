@@ -5,14 +5,24 @@ spring:
     username: ohgiraffers
     password: ohgiraffers
 
-#jpa config
+# jpa config
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
 
+# file upload size
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
-#server prot
+# server prot
 server:
   port: 8001
+
+# image file
+image:
+  image-url: http://localhost:8001/productimgs/
+  image-dir: src/main/resources/static/productimgs
