@@ -1,6 +1,5 @@
 package com.ohgiraffers.comprehensive.product.domain;
 
-import com.ohgiraffers.comprehensive.product.domain.repository.ProductRepository;
 import com.ohgiraffers.comprehensive.product.domain.type.ProductStatusType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "tbl_product")
 @NoArgsConstructor(access = PROTECTED)
 @Getter
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class) // JPA에서 엔터티의 생명주기 이벤트를 수신하는 리스너를 지정하기 위한 어노테이션
 @SQLDelete(sql = "UPDATE tbl_product SET status = 'DELETED' WHERE product_code = ?")
 public class Product {
 
@@ -82,7 +81,6 @@ public class Product {
                 productStock
         );
     }
-
 
     public void updateProductImageUrl(String productImageUrl) {
         this.productImageUrl = productImageUrl;
