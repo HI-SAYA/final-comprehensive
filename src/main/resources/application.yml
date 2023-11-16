@@ -32,5 +32,6 @@ jwt:
   secret: asdfjp298pafo1320efqw0udvnh0er0h412r08byfdq9dsvh02143908hfeqwn80fdqs0nfdqs0n412013rq0nqefn08dfas0das730732g86923
   access:
     expiration: 3600000
+    #expiration: 1000
   refresh:
     expiration: 604800000

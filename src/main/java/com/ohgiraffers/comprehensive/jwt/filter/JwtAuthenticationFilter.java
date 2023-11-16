@@ -43,5 +43,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         /* 2-2 Refresh Token이 없다면?
         * - AccessToken 유효성 확인
         * */
+
+        if(refreshToken == null) {
+            jwtService.checkAccessTokenAndAuthentication(request, response, filterChain);
+        }
     }
 }

@@ -10,11 +10,19 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
@@ -81,6 +89,14 @@ public class JwtService {
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
+    public Optional<String> getAccessToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader("Access-Token"))
+                .filter(accessToken -> accessToken.startsWith(BEARER))
+                .map(accessToken -> accessToken.replace(BEARER, ""));
+                // 액세스 토큰이 있으면 필터링을 하는데 Bearer XXXXX 넘어온다.
+                // BEARER를 제거하고 쓰겠다. (replace)
+    }
+
     public boolean isValidToken(String token) {
 
         try {
@@ -112,4 +128,52 @@ public class JwtService {
     }
 
 
+    public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        getAccessToken(request)
+                .filter(this::isValidToken) // 유효한 지 판단
+                .ifPresent(accessToken -> getMemberId(accessToken) // 유효하다고 판단했을 경우 - memberId를 꺼내온다.
+                                .ifPresent(memberId -> memberRepository.findByMemberId(memberId)
+                                        .ifPresent(this::saveAuthentication))); // 문제가 없다면 여기까지 도달한 것
+
+        filterChain.doFilter(request, response);
+        
+    }
+
+
+
+
+    private Optional<String> getMemberId(String accessToken) {
+        try {
+            return Optional.ofNullable(
+                    Jwts.parserBuilder() // Jwts에서부터 파싱처리할 수 있는 객체를 불러온다.
+                            .setSigningKey(key) // 서명키
+                            .build()
+                            .parseClaimsJws(accessToken) // Claims = payload 정보 몸체
+                            .getBody()            // Body를 얻으면 그 안에 Claims을 얻는다.
+                            .get("memberId").toString()     // memberId로 선별
+            );
+
+        } catch (Exception e) {
+            log.error("Access Token이 유효하지 않습니다.");
+            return Optional.empty();
+            // accessToken 안에 MemberId를 꺼내온다. 없을 경우 문제가 생기니까 Exception 핸들링을 미리 해놓았다.
+        }
+    }
+
+    public void saveAuthentication(Member member) {
+
+        UserDetails userDetails = User.builder()
+                .username(member.getMemberId())
+                .password(member.getMemberPassword())
+                .roles(member.getMemberRole().name())
+                .build();
+
+        Authentication authentication
+                = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        // 생성자에 3개의 인자 전달 principal(현재 인증된 사용자),
+        // credentials(세팅할 필요 없어서 null, 로그인 체크 여부),
+        // authority 인증-> 인가 처리 때문에 getAuthorities() 써야 한다.(user인지 admin인지 체크)
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 }
