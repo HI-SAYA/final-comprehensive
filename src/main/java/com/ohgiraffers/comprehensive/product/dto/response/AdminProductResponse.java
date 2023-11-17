@@ -16,6 +16,7 @@ public class AdminProductResponse {
     private final String productDescription;
     private final Long categoryCode;
     private final String categoryName;
+    private final String productImageUrl;
     private final Long productStock;
     private final ProductStatusType status;
 
@@ -27,6 +28,7 @@ public class AdminProductResponse {
                 product.getProductDescription(),
                 product.getCategory().getCategoryCode(),
                 product.getCategory().getCategoryName(),
+                product.getProductImageUrl(),
                 product.getProductStock(),
                 product.getStatus()
         );
