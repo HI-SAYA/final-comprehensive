@@ -1,6 +1,8 @@
 package com.ohgiraffers.comprehensive.jwt.service;
 
 import com.ohgiraffers.comprehensive.common.exception.BadRequestException;
+import com.ohgiraffers.comprehensive.common.exception.NotFoundException;
+import com.ohgiraffers.comprehensive.jwt.CustomUser;
 import com.ohgiraffers.comprehensive.member.domain.Member;
 import com.ohgiraffers.comprehensive.member.domain.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
@@ -79,7 +81,7 @@ public class JwtService {
         memberRepository.findByMemberId(memberId)
                 .ifPresentOrElse(
                         member -> member.updateRefreshToken(refreshToken),
-                        () -> new BadRequestException(NOT_FOUND_MEMBER_ID)
+                        () -> new NotFoundException(NOT_FOUND_MEMBER_ID)
                 );
     }
 
@@ -160,6 +162,7 @@ public class JwtService {
         }
     }
 
+    /* ******* 중요 */
     public void saveAuthentication(Member member) {
 
         UserDetails userDetails = User.builder()
@@ -168,11 +171,16 @@ public class JwtService {
                 .roles(member.getMemberRole().name())
                 .build();
 
-        Authentication authentication
-                = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        CustomUser customUser = CustomUser.of(member.getMemberCode(), userDetails);
+
+//        Authentication authentication
+//                = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         // 생성자에 3개의 인자 전달 principal(현재 인증된 사용자),
         // credentials(세팅할 필요 없어서 null, 로그인 체크 여부),
         // authority 인증-> 인가 처리 때문에 getAuthorities() 써야 한다.(user인지 admin인지 체크)
+        Authentication authentication
+                = new UsernamePasswordAuthenticationToken(customUser, null, customUser.getAuthorities());
+        // 커스텀한 인증 객체를 저장하여 사용한다. (memberCode를 더하여 저장하기 위해 이렇게 처리함)
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

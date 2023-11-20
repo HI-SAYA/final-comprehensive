@@ -1,10 +1,12 @@
 package com.ohgiraffers.comprehensive.common.exception;
 
 import com.ohgiraffers.comprehensive.common.exception.type.ExceptionCode;
+import lombok.Getter;
 
-public class ServerInternalException extends CustomException {
+@Getter
+public class ConflictException extends CustomException {
 
-    public ServerInternalException(final ExceptionCode exceptionCode) {
+    public ConflictException(final ExceptionCode exceptionCode) {
         super(exceptionCode);
     }
 }
