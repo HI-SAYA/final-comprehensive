@@ -74,7 +74,16 @@ public class ReviewService {
 
         Product product = productRepository.findById(reviewRequest.getProductCode())
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_PRODUCT_CODE));
-
+        // reviewRequest에서 얻은 제품코드 getProductCode()를 사용하여
+        // 데이터 베이스에서 Product 엔티티를 찾는다.
+        // 첫줄 - 해당 제품 코드를 가진 Product 엔터티를 DB에서 찾기 위해 productRepository를 사용한다.
+        // findById 메서드는 주어진 ID에 해당하는 엔티티를 찾아 반환하거나, 찾지 못하면
+        // 비어있는 Optional을 반환한다.
+        // .orElseThrow(() -> new NotFound~ 만약 findById가 비어있는 Optinal을 반환한다면,
+        // orElseThrow 메서드를 사용하여 예외를 던진다. 여기서는 NotFoundException을 던지고,
+        // 해당 예외에는 NOT_FOUND_PRODUCT_CODE라는 메세지를 포함한다.
+        // 이것은 주로 특정 제품 코드에 해당하는 제품이 DB에 없을 경우에 예외를 발생시키고,
+        // 해당 예외를 적절히 처리하는 곳에서 처리하도록 하는 용도로 사용된다.
         Member member = memberRepository.findById(customUser.getMemberCode())
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER_CODE));
 

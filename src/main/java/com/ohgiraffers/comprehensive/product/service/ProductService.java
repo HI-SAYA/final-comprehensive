@@ -1,6 +1,5 @@
 package com.ohgiraffers.comprehensive.product.service;
 
-import com.ohgiraffers.comprehensive.common.exception.BadRequestException;
 import com.ohgiraffers.comprehensive.common.exception.NotFoundException;
 import com.ohgiraffers.comprehensive.common.util.FileUploadUtils;
 import com.ohgiraffers.comprehensive.product.domain.Category;

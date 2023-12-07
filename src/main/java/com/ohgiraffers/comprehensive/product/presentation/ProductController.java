@@ -85,7 +85,8 @@ public class ProductController {
 
 
     /* 6. 상품 상세 조회 : productCode로 상품 1개 조회, 주문 불가 상품 포함(관리자) */
-    @GetMapping("/products-management/{productCode}")
+    @GetMapping("/products- " +
+            "management/{productCode}")
     public ResponseEntity<AdminProductResponse> getAdminProduct(@PathVariable final Long productCode) {
 
         final AdminProductResponse adminProductResponse = productService.getAdminProduct(productCode);
